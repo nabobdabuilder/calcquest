@@ -4,7 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
-import { QUESTIONS, getRandomQuestion } from "./src/game/questions.js";
+import { QUESTIONS, getRandomQuestion } from "./src/game/questions.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
