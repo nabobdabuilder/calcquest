@@ -1,0 +1,6 @@
+{
+  "name": "CalcQuest",
+  "description": "An RPG-style game for AP Calculus BC Unit 7, featuring battles powered by calculus questions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
