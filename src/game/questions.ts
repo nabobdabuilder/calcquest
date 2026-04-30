@@ -1,4 +1,4 @@
-import { Question, Topic } from '../types.ts';
+import type { Question, Topic } from '../types.ts';
 
 export const QUESTIONS: Question[] = [
   // Parametric
