@@ -7,7 +7,7 @@ import { MathText } from '../components/MathText';
 
 const CampaignWorld = React.lazy(() => import('./CampaignWorld'));
 
-type GameState = 'CUSTOMIZE' | 'MODE_SELECT' | 'INSTRUCTIONS_PVP' | 'INSTRUCTIONS_PVE' | 'MATCHMAKING' | 'MATCH_FOUND' | 'BATTLE_SELECT_STANCE' | 'BATTLE_ANSWER_QUESTION' | 'BATTLE_RESOLVE' | 'GAME_OVER' | 'CAMPAIGN';
+type GameState = 'CUSTOMIZE' | 'THEME_SELECT' | 'MODE_SELECT' | 'INSTRUCTIONS_PVP' | 'INSTRUCTIONS_PVE' | 'MATCHMAKING' | 'MATCH_FOUND' | 'BATTLE_SELECT_STANCE' | 'BATTLE_ANSWER_QUESTION' | 'BATTLE_RESOLVE' | 'GAME_OVER' | 'CAMPAIGN';
 
 type Stance = 'ATTACK' | 'DEFEND' | 'MAGIC' | 'HEAL' | 'SUPER_DOMAIN_EXPANSION' | 'SUPER_BANKAI' | 'SUPER_HOLLOW_PURPLE';
 
@@ -28,6 +28,7 @@ export function Game() {
   // Customization
   const [name, setName] = useState('');
   const [avatarIndex, setAvatarIndex] = useState(0);
+  const [selectedBgColor, setSelectedBgColor] = useState('#1e1b4b');
 
   // Network state
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -371,7 +372,7 @@ export function Game() {
 
   if (gameState === 'CUSTOMIZE') {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#ffd6e0] flex flex-col items-center justify-center pt-8 pb-8 relative overflow-hidden font-sans">
+      <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center pt-8 pb-8 relative overflow-hidden font-sans transition-colors duration-700" style={{ backgroundColor: selectedBgColor === '#1e1b4b' ? '#ffd6e0' : selectedBgColor }}>
         {/* Floating background elements */}
         <div className="absolute top-10 left-10 text-5xl opacity-40 animate-bounce" style={{animationDuration: '3s'}}>✨</div>
         <div className="absolute bottom-20 right-20 text-6xl opacity-40 animate-pulse" style={{animationDuration: '4s'}}>🌟</div>
@@ -420,10 +421,10 @@ export function Game() {
               maxLength={15}
             />
           </div>
-          
+
           <div className="flex flex-col w-full gap-4">
             <button 
-              onClick={() => setGameState('MODE_SELECT')}
+              onClick={() => setGameState('THEME_SELECT')}
               disabled={!name.trim()}
               className="w-full bg-[#3ecf8e] text-white font-black text-xl py-5 rounded-2xl border-b-[8px] border-[#2bae74] active:border-b-[0px] active:translate-y-[8px] disabled:opacity-50 disabled:active:border-b-[8px] disabled:active:translate-y-0 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
             >
@@ -435,9 +436,61 @@ export function Game() {
     );
   }
 
+  if (gameState === 'THEME_SELECT') {
+    return (
+      <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center p-8 relative overflow-hidden font-sans transition-colors duration-700" style={{ backgroundColor: selectedBgColor === '#1e1b4b' ? '#ffd6e0' : selectedBgColor }}>
+        {/* Floating background elements */}
+        <div className="absolute top-10 right-20 text-5xl opacity-40 animate-bounce" style={{animationDuration: '3s'}}>✨</div>
+        <div className="absolute bottom-20 left-10 text-6xl opacity-40 animate-pulse" style={{animationDuration: '4s'}}>🌟</div>
+
+        <div className="bg-white p-8 md:p-12 rounded-[3rem] border-[6px] border-[#ff9eb5] shadow-[0_12px_0_#ff9eb5] max-w-xl w-full relative z-10 flex flex-col items-center">
+          <h1 className="text-4xl font-black text-center text-[#ff6b8b] mb-2 drop-shadow-sm">Choose Your Vibe</h1>
+          <p className="text-[#a49a9c] text-center mb-10 font-medium">Select an aesthetic for your magical journey</p>
+
+          <div className="grid grid-cols-2 gap-6 w-full mb-10">
+            {[
+              { name: 'Midnight', color: '#1e1b4b', desc: 'Dark & Deep' },
+              { name: 'Sky', color: '#e0f7fa', desc: 'Bright & Calm' },
+              { name: 'Rose', color: '#ffd6e0', desc: 'Soft & Sweet' },
+              { name: 'Lavender', color: '#f5f3ff', desc: 'Cool & Mystic' },
+            ].map((theme) => (
+              <button
+                key={theme.name}
+                onClick={() => setSelectedBgColor(theme.color)}
+                className={`flex flex-col items-center p-6 rounded-[2rem] border-4 transition-all ${selectedBgColor === theme.color ? 'border-[#ff6b8b] bg-[#fff0f3] scale-105 shadow-md' : 'border-[#e9ecef] bg-[#f8f9fa] hover:border-[#ff9eb5]'}`}
+              >
+                <div 
+                  className={`w-16 h-16 rounded-full border-4 border-white shadow-sm mb-3`}
+                  style={{ backgroundColor: theme.color }}
+                />
+                <span className={`font-black uppercase tracking-tight ${selectedBgColor === theme.color ? 'text-[#ff6b8b]' : 'text-[#495057]'}`}>{theme.name}</span>
+                <span className="text-[10px] font-bold text-[#a49a9c] uppercase">{theme.desc}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-4 w-full">
+            <button 
+              onClick={() => setGameState('CUSTOMIZE')}
+              className="flex-1 bg-white text-[#ff9eb5] font-black text-xl py-4 rounded-xl border-4 border-[#ff9eb5] shadow-[0_4px_0_#ff9eb5] active:translate-y-1 active:shadow-[0_0px_0_#ff9eb5] transition-all cursor-pointer"
+            >
+              Back
+            </button>
+            <button 
+              onClick={() => setGameState('MODE_SELECT')}
+              className="flex-[2] bg-[#3ecf8e] text-white font-black text-xl py-4 rounded-xl border-b-[8px] border-[#2bae74] active:border-b-[0px] active:translate-y-[8px] transition-all cursor-pointer"
+            >
+              Confirm Choice
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (gameState === 'MODE_SELECT') {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#ffd6e0] flex flex-col items-center justify-center p-8 relative overflow-hidden font-sans">
+      <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center p-8 relative overflow-hidden font-sans transition-colors duration-700" style={{ backgroundColor: selectedBgColor === '#1e1b4b' ? '#ffd6e0' : selectedBgColor }}>
         {/* Floating background elements */}
         <div className="absolute top-10 right-20 text-5xl opacity-40 animate-bounce" style={{animationDuration: '3s'}}>✨</div>
         <div className="absolute bottom-20 left-10 text-6xl opacity-40 animate-pulse" style={{animationDuration: '4s'}}>🌟</div>
@@ -568,7 +621,7 @@ export function Game() {
 
   if (gameState === 'MATCHMAKING' || gameState === 'MATCH_FOUND') {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#ffd6e0] flex flex-col items-center justify-center overflow-hidden font-sans relative">
+      <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden font-sans relative transition-colors duration-700" style={{ backgroundColor: selectedBgColor }}>
         <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
         
         {/* Animated background stripes for high energy when match is found */}
@@ -726,12 +779,14 @@ export function Game() {
           myHp={roomState.players[myId]?.hp || 100} 
           oppHp={(oppId ? roomState.players[oppId]?.hp : 100) || 100}
           overrideMode={debugBg === 'normal' ? undefined : debugBg} 
+          selectedBgColor={selectedBgColor}
         />
       ) : (
         <DynamicBackground 
           myHp={100} 
           oppHp={100} 
           overrideMode={debugBg === 'normal' ? undefined : debugBg}
+          selectedBgColor={selectedBgColor}
         />
       )}
 
@@ -1538,17 +1593,17 @@ function BattleLog({ roundResult, myId }: { roundResult: any, myId: string }) {
   );
 }
 
-function DynamicBackground({ myHp, oppHp, overrideMode }: { myHp: number, oppHp: number, overrideMode?: 'winning' | 'losing' | 'intense' }) {
+function DynamicBackground({ myHp, oppHp, overrideMode, selectedBgColor }: { myHp: number, oppHp: number, overrideMode?: 'winning' | 'losing' | 'intense', selectedBgColor: string }) {
   const isWinning = overrideMode === 'winning' || (!overrideMode && oppHp < 40 && myHp >= 40);
   const isLosing = overrideMode === 'losing' || (!overrideMode && myHp < 40 && oppHp >= 40);
   const isIntense = overrideMode === 'intense' || (!overrideMode && myHp < 40 && oppHp < 40);
 
   return (
     <div className="absolute inset-0 z-0 pointer-events-none transition-colors duration-1000 overflow-hidden">
-      {/* Base Light Blue - transitions slightly */}
+      {/* User Selected Base Color */}
       <motion.div 
         animate={{ 
-          backgroundColor: isWinning ? '#fff7ed' : isLosing ? '#f0f9ff' : isIntense ? '#1e1b4b' : '#e0f7fa' 
+          backgroundColor: overrideMode === 'winning' ? '#fff7ed' : overrideMode === 'losing' ? '#f0f9ff' : overrideMode === 'intense' ? '#1e1b4b' : myHp < 40 && oppHp < 40 ? '#1e1b4b' : (selectedBgColor || '#1e1b4b')
         }}
         className="absolute inset-0"
       />

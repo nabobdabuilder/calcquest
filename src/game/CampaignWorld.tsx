@@ -88,8 +88,8 @@ const isWalkable = (x: number, y: number) => {
 const INITIAL_NPCS = [
   { 
     id: 'elder', 
-    x: 2, 
-    y: 2, 
+    x: 4, 
+    y: 3, 
     name: 'The Elder', 
     type: 'friendly', 
     sprite: 'https://api.dicebear.com/7.x/bottts/svg?seed=elder',
@@ -242,6 +242,7 @@ export default function CampaignWorld({ name, avatar, onBack, onStartBattle }: C
   // World State
   const [npcs, setNpcs] = useState(campaignStore.npcs);
   const [activeDialog, setActiveDialog] = useState<null | { npcId: string, textLines: string[], currentLineIndex: number }>(null);
+  const [canInteract, setCanInteract] = useState<null | string>(null);
 
   // Typewriter effect state
   const [displayedText, setDisplayedText] = useState("");
@@ -342,6 +343,17 @@ export default function CampaignWorld({ name, avatar, onBack, onStartBattle }: C
   // Movement Loop for holding keys
   useEffect(() => {
     const interval = setInterval(() => {
+      // Check for interaction proximity
+      let checkX = playerPos.x;
+      let checkY = playerPos.y;
+      if (facing === 'up') checkY--;
+      if (facing === 'down') checkY++;
+      if (facing === 'left') checkX--;
+      if (facing === 'right') checkX++;
+
+      const nearbyNpc = npcs.find(n => n.x === checkX && n.y === checkY);
+      setCanInteract(nearbyNpc ? nearbyNpc.id : null);
+
       if (isMoving || activeDialog) return;
 
       const keys = keysPressed.current;
@@ -352,7 +364,7 @@ export default function CampaignWorld({ name, avatar, onBack, onStartBattle }: C
     }, 50); // Frequent checks for immediate responsiveness
 
     return () => clearInterval(interval);
-  }, [isMoving, activeDialog, move]);
+  }, [isMoving, activeDialog, move, playerPos, facing, npcs]);
 
   // Typewriter effect
   useEffect(() => {
@@ -501,6 +513,21 @@ export default function CampaignWorld({ name, avatar, onBack, onStartBattle }: C
               <div className={`w-[120%] h-[120%] mb-4 filter drop-shadow-md pb-4 animate-bounce ${npc.type === 'enemy' ? 'bg-red-900/40 rounded-full border border-red-500/50' : ''}`} style={{animationDuration: npc.isBattle ? '1.5s' : '2.5s'}}>
                 <img src={npc.sprite} alt={npc.name} className="w-full h-full object-cover" />
               </div>
+              
+              <AnimatePresence>
+                {canInteract === npc.id && !activeDialog && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                    className="absolute -top-12 bg-white px-3 py-1.5 rounded-xl border-4 border-[#3ecf8e] shadow-[0_4px_0_#2bae74] flex items-center gap-2 z-30"
+                  >
+                    <span className="bg-[#f1f5f9] px-2 py-0.5 rounded-lg border-2 border-[#e2e8f0] text-xs font-black text-[#64748b]">E</span>
+                    <span className="text-xs font-black text-[#10b981] uppercase tracking-tighter">Talk</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="absolute -bottom-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-bold text-slate-700 shadow-sm border border-slate-200 whitespace-nowrap">
                 {npc.name}
               </div>
