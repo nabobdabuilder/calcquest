@@ -172,12 +172,20 @@ export function Game() {
     const stances: Stance[] = ['ATTACK', 'DEFEND', 'MAGIC', 'HEAL'];
     const botStance = stances[Math.floor(Math.random() * stances.length)];
     
-    // Choose question based on bot's topic
-    const topic = botOpponent?.topic || 'Parametric';
-    const topicQuestions = QUESTIONS.filter(q => q.topic === topic);
-    const q = topicQuestions.length > 0 
-      ? topicQuestions[Math.floor(Math.random() * topicQuestions.length)]
-      : QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+    // Choose question
+    const isSuper = stance.startsWith('SUPER_');
+    let q;
+    
+    if (isSuper) {
+      const { getRandomQuestion } = await import('./questions');
+      q = getRandomQuestion('Nightmare');
+    } else {
+      const topic = botOpponent?.topic || 'Parametric';
+      const topicQuestions = QUESTIONS.filter(q => q.topic === topic && (q.difficulty || 'Normal') === 'Normal');
+      q = topicQuestions.length > 0 
+        ? topicQuestions[Math.floor(Math.random() * topicQuestions.length)]
+        : QUESTIONS.filter(q => (q.difficulty || 'Normal') === 'Normal')[Math.floor(Math.random() * QUESTIONS.length)];
+    }
 
     setRoomState((prev: any) => {
       const next = { ...prev };
