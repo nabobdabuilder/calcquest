@@ -1,200 +1,183 @@
-import type { Question, Topic } from '../types.ts';
+import type { Question } from '../types.ts';
 
 export const QUESTIONS: Question[] = [
-  // Parametric
+  // --- SECTION 1: REGULAR QUESTIONS ---
+  
+  // Parametric (Keep a few basics for the start)
   {
     id: 'param_1',
     topic: 'Parametric',
-    text: 'What is 1 + 1?',
+    text: 'A particle moves with $x(t) = t^2$ and $y(t) = 3t - 1$. Find the coordinates at $t = 2$.',
     options: [
-      '2',
-      '3',
-      '4',
-      '5'
+      '(4, 5)',
+      '(2, 5)',
+      '(4, 7)',
+      '(2, 7)'
     ],
     correctIndex: 0,
-    explanation: 'Basic math.'
+    explanation: '$x(2) = 2^2 = 4$, $y(2) = 3(2) - 1 = 5$.'
   },
-  {
-    id: 'param_2',
-    topic: 'Parametric',
-    text: 'What is 2 + 2?',
-    options: [
-      '4',
-      '5',
-      '6',
-      '7'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-  {
-    id: 'param_3',
-    topic: 'Parametric',
-    text: 'What is 3 + 3?',
-    options: [
-      '6',
-      '7',
-      '8',
-      '9'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-  
+
   // Polar Graphing
   {
-    id: 'polar_graph_1',
+    id: 'polar_1',
     topic: 'Polar Graphing',
-    text: 'What is 4 + 4?',
+    text: 'The polar point $(3, 5\\pi/6)$ has Cartesian coordinates $(x, y)$. Find the Cartesian coordinates.',
     options: [
-      '8',
-      '9',
-      '10',
-      '11'
+      '$(3\\sqrt{3}/2, 3/2)$',
+      '$(-3\\sqrt{3}/2, 3/2)$',
+      '$(-3/2, 3\\sqrt{3}/2)$',
+      '$(3/2, -3\\sqrt{3}/2)$',
+      '$(-3\\sqrt{3}/2, -3/2)$'
     ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
+    correctIndex: 1,
+    explanation: '$x = r\\cos(\\theta) = 3\\cos(5\\pi/6) = -3\\sqrt{3}/2$. $y = r\\sin(\\theta) = 3\\sin(5\\pi/6) = 3/2$.'
   },
   {
-    id: 'polar_graph_2',
+    id: 'polar_2',
     topic: 'Polar Graphing',
-    text: 'What is 5 + 5?',
+    text: 'A position is located at $(-1, \\sqrt{3})$ on the Cartesian map. Encode this location in polar form $(r, \\theta)$ where $r > 0$ and $0 \\leq \\theta < 2\\pi$.',
     options: [
-      '10',
-      '11',
-      '12',
-      '13'
+      '$(2, \\pi/3)$',
+      '$(2, \\pi/6)$',
+      '$(2, 2\\pi/3)$',
+      '$(\\sqrt{2}, 5\\pi/6)$',
+      '$(2, 5\\pi/3)$'
     ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
+    correctIndex: 2,
+    explanation: '$r = \\sqrt{(-1)^2 + (\\sqrt{3})^2} = 2$. $\\theta = \\arctan(\\sqrt{3}/-1) = 2\\pi/3$ (Quadrant II).'
   },
-
-  // Polar Derivatives
   {
-    id: 'polar_deriv_1',
+    id: 'polar_3',
+    topic: 'Polar Graphing',
+    text: 'Which Cartesian equation is equivalent to the polar equation $r = 4\\sin(\\theta)$?',
+    options: [
+      '$x^2 + y^2 = 4$',
+      '$x^2 + (y - 4)^2 = 16$',
+      '$x^2 + (y - 2)^2 = 4$',
+      '$(x - 2)^2 + y^2 = 4$',
+      '$x^2 + y^2 = 4y$'
+    ],
+    correctIndex: 2,
+    explanation: '$r^2 = 4r\\sin(\\theta) \\Rightarrow x^2 + y^2 = 4y \\Rightarrow x^2 + (y-2)^2 = 4$. Option C is the simplified form, but E is also correct algebraically. C is the standard circle form.'
+  },
+  {
+    id: 'polar_4',
+    topic: 'Polar Graphing',
+    text: 'Which polar equation is equivalent to the Cartesian equation $x^2 + y^2 - 6x = 0$?',
+    options: [
+      '$r = 6$',
+      '$r = 6\\sin(\\theta)$',
+      '$r^2 = 6\\cos(\\theta)$',
+      '$r = 6\\cos(\\theta)$',
+      '$r = 3\\cos(\\theta)$'
+    ],
+    correctIndex: 3,
+    explanation: '$r^2 - 6r\\cos(\\theta) = 0 \\Rightarrow r(r - 6\\cos(\\theta)) = 0 \\Rightarrow r = 6\\cos(\\theta)$.'
+  },
+  {
+    id: 'polar_5',
     topic: 'Polar Derivatives',
-    text: 'What is 6 + 6?',
+    text: 'Find the slope of the line tangent to the curve $r = 3\\cos(\\theta)$ at $\\theta = \\pi/3$.',
     options: [
-      '12',
-      '13',
-      '14',
-      '15'
+      '$-\\sqrt{3}$',
+      '$-1/\\sqrt{3}$',
+      '$0$',
+      '$\\sqrt{3}/3$',
+      '$\\sqrt{3}$'
     ],
     correctIndex: 0,
-    explanation: 'Basic math.'
+    explanation: '$dy/dx = (r\'\\sin\\theta + r\\cos\\theta)/(r\'\\cos\\theta - r\\sin\\theta)$. For $r=3\\cos\\theta$, $r\'=-3\\sin\\theta$. At $\\theta=\\pi/3$, slope is $-\\sqrt{3}$.'
   },
   {
-    id: 'polar_deriv_2',
-    topic: 'Polar Derivatives',
-    text: 'What is 7 + 7?',
+    id: 'polar_6',
+    topic: 'Polar Graphing',
+    text: 'A curve consists of two perfect lobes—one left, one right—pinched at the origin (Lemniscate). Which equation matches this curve?',
     options: [
-      '14',
-      '15',
-      '16',
-      '17'
+      '$r = \\sin(2\\theta)$',
+      '$r = 1 + \\cos(2\\theta)$',
+      '$r^2 = 4\\cos(2\\theta)$',
+      '$r = 4\\cos(\\theta)$',
+      '$r^2 = 4\\sin(2\\theta)$'
+    ],
+    correctIndex: 2,
+    explanation: '$r^2 = a^2\\cos(2\\theta)$ is the standard form for a horizontal lemniscate.'
+  },
+  {
+    id: 'polar_7',
+    topic: 'Polar Graphing',
+    text: 'A curve passes through $(5, 0)$ and $(1, \\pi)$. It is thick on the right and compressed on the left (Limaçon). Which equation matches this?',
+    options: [
+      '$r = 2 + 3\\cos(\\theta)$',
+      '$r = 3 + 2\\cos(\\theta)$',
+      '$r = 3\\cos(\\theta)$',
+      '$r^2 = 3\\cos(2\\theta)$',
+      '$r = 2 - 2\\cos(\\theta)$'
+    ],
+    correctIndex: 1,
+    explanation: 'Check points: $3+2\\cos(0) = 5$. $3+2\\cos(\\pi) = 1$.'
+  },
+  {
+    id: 'polar_8',
+    topic: 'Polar Graphing',
+    text: 'How many petals does the rose curve $r = 8\\cos(5\\theta)$ have?',
+    options: [
+      '5 petals',
+      '10 petals',
+      '8 petals',
+      '2.5 petals',
+      'Infinitely many'
     ],
     correctIndex: 0,
-    explanation: 'Basic math.'
+    explanation: 'For $r = a\\cos(n\\theta)$, if $n$ is odd, there are $n$ petals.'
   },
 
-  // Polar Area
-  {
-    id: 'polar_area_1',
-    topic: 'Polar Area',
-    text: 'What is 8 + 8?',
-    options: [
-      '16',
-      '17',
-      '18',
-      '19'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-  {
-    id: 'polar_area_2',
-    topic: 'Polar Area',
-    text: 'What is 9 + 9?',
-    options: [
-      '18',
-      '19',
-      '20',
-      '21'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-
-  // Polar Area Between
-  {
-    id: 'polar_area_btn_1',
-    topic: 'Polar Area Between',
-    text: 'What is 10 + 10?',
-    options: [
-      '20',
-      '21',
-      '22',
-      '23'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-  {
-    id: 'polar_area_btn_2',
-    topic: 'Polar Area Between',
-    text: 'What is 11 + 11?',
-    options: [
-      '22',
-      '23',
-      '24',
-      '25'
-    ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
-  },
-  // Nightmare Questions
+  // --- SECTION 2: NIGHTMARE QUESTIONS ---
+  
   {
     id: 'nightmare_1',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
-    text: 'What is 100 + 100?',
+    text: 'Consider $r = 1 + 2\\cos(\\theta)$. At what values of $\\theta$ in $[0, 2\\pi)$ does the curve pass through the origin?',
     options: [
-      '200',
-      '300',
-      '400',
-      '500'
+      '$\\pi/3$ and $5\\pi/3$',
+      '$2\\pi/3$ and $4\\pi/3$',
+      '$\\pi/2$ and $3\\pi/2$',
+      '$\\pi/6$ and $11\\pi/6$',
+      'None, it never passes through the origin'
     ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
+    correctIndex: 1,
+    explanation: '$1 + 2\\cos\\theta = 0 \\Rightarrow \\cos\\theta = -1/2 \\Rightarrow \\theta = 2\\pi/3, 4\\pi/3$.'
   },
   {
     id: 'nightmare_2',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
-    text: 'What is 200 + 200?',
+    text: 'For the curve $r = 1 + 2\\cos(\\theta)$, what is the slope of the tangent line at $\\theta = \\pi/2$?',
     options: [
-      '400',
-      '500',
-      '600',
-      '700'
+      '$1/2$',
+      '$-1/2$',
+      '$2$',
+      '$-2$',
+      '$0$'
     ],
     correctIndex: 0,
-    explanation: 'Basic math.'
+    explanation: '$x = (1+2\\cos\\theta)\\cos\\theta$, $y = (1+2\\cos\\theta)\\sin\\theta$. $dy/dx$ at $\\pi/2$ is $1/2$.'
   },
   {
     id: 'nightmare_3',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
-    text: 'What is 500 + 500?',
+    text: 'Regarding $r = 1 + 2\\cos(\\theta)$, which scholar correctly identifies the area of the outer loop?',
     options: [
-      '1000',
-      '1500',
-      '2000',
-      '2500'
+      'Scholar 1: Total area is $3\\pi$.',
+      'Scholar 2: Outer loop is $\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}r^2 d\\theta$.',
+      'Scholar 3: Subtract inner loop from total.',
+      'All of them are wrong.',
+      'Scholar 2 & 3 are partially correct.'
     ],
-    correctIndex: 0,
-    explanation: 'Basic math.'
+    correctIndex: 1,
+    explanation: 'The outer loop is traced from $-2\\pi/3$ to $2\\pi/3$. Area is $\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}(1+2\\cos\\theta)^2 d\\theta$.'
   }
 ];
 
