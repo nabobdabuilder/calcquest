@@ -5,6 +5,12 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import { QUESTIONS, getRandomQuestion } from "./src/game/questions.ts";
+import { GoogleGenAI } from "@google/genai";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -122,28 +128,28 @@ async function startServer() {
         
         io.to(p1.id).emit("question_phase", {
           question: room.playerQuestions[p1.id],
-          endTime: Date.now() + 20000 // 20 seconds to answer
+          endTime: 0 // No time limit
         });
         io.to(p2.id).emit("question_phase", {
           question: room.playerQuestions[p2.id],
-          endTime: Date.now() + 20000
+          endTime: 0
         });
-
-        // Set timeout to resolve if answers are slow
-        room.timer = setTimeout(() => {
-          resolveRound(data.roomId);
-        }, 20000);
       }
     });
 
     socket.on("submit_answer", (data) => {
-      // data: { roomId: string, answerIndex: number }
+      // data: { roomId: string, answerIndex?: number, isCorrect?: boolean }
       const room = rooms.get(data.roomId);
       if (!room || room.state !== 'ANSWER_QUESTION') return;
 
       if (!room.answers[socket.id]) {
         const question = room.playerQuestions[socket.id];
-        const isCorrect = data.answerIndex === question.correctIndex;
+        let isCorrect = false;
+        if (question.isFRQ) {
+          isCorrect = data.isCorrect === true;
+        } else {
+          isCorrect = data.answerIndex === question.correctIndex;
+        }
         room.answers[socket.id] = {
           correct: isCorrect,
           time: Date.now()
@@ -158,10 +164,50 @@ async function startServer() {
         }
       }
 
-      // If both answered, clear timeout and resolve
+      // If both answered, resolve
       if (Object.keys(room.answers).length === 2) {
-        clearTimeout(room.timer);
         resolveRound(data.roomId);
+      }
+    });
+
+    socket.on("check_frq_with_gemini", async (data) => {
+      // data: { roomId: string, imageBase64: string, mimeType: string }
+      try {
+        const room = rooms.get(data.roomId);
+        if (!room || room.state !== 'ANSWER_QUESTION') return;
+        const question = room.playerQuestions[socket.id];
+        
+        if (!process.env.GEMINI_API_KEY) {
+           socket.emit("gemini_result", { error: "Gemini API Key missing on server." });
+           return;
+        }
+
+        const prompt = `You are a strict AP Calculus grader.
+The student was asked this question:
+${question.text}
+
+The correct answer is: ${question.answerKey}
+
+The student has uploaded an image of their work. Analyze their work. 
+If they arrived at the correct answer and their work generally supports it, respond with exactly "CORRECT". 
+If they did not get the correct answer, or their work is fundamentally flawed, respond with exactly "INCORRECT".
+After "CORRECT" or "INCORRECT", provide a very brief 1-2 sentence explanation of your decision.`;
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: [
+            prompt,
+            { inlineData: { data: data.imageBase64, mimeType: data.mimeType } }
+          ]
+        });
+
+        const text = response.text || "";
+        const isCorrect = text.trim().toUpperCase().startsWith("CORRECT");
+        
+        socket.emit("gemini_result", { correct: isCorrect, explanation: text });
+      } catch (err) {
+        console.error("Gemini API Error:", err);
+        socket.emit("gemini_result", { error: "Failed to grade image using Gemini API." });
       }
     });
 

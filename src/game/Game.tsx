@@ -47,6 +47,11 @@ export function Game() {
   const [activeEmotes, setActiveEmotes] = useState<{[key: string]: { emote: string, id: number }}>({}); // playerId -> emote details
   const [deathDialogIndex, setDeathDialogIndex] = useState<number>(0);
 
+  // FRQ State
+  const [isCheckingFRQ, setIsCheckingFRQ] = useState(false);
+  const [showManualCheck, setShowManualCheck] = useState(false);
+  const [geminiResult, setGeminiResult] = useState<{ correct: boolean, explanation: string } | null>(null);
+
   useEffect(() => {
     socket = io();
 
@@ -117,6 +122,15 @@ export function Game() {
           return prev;
         });
       }, 3000);
+    });
+
+    socket.on('gemini_result', (data: { correct?: boolean, explanation?: string, error?: string }) => {
+      setIsCheckingFRQ(false);
+      if (data.error) {
+        alert("Error grading work: " + data.error);
+        return;
+      }
+      setGeminiResult({ correct: data.correct!, explanation: data.explanation! });
     });
 
     socket.on('opponent_disconnected', () => {
@@ -199,14 +213,23 @@ export function Game() {
     setGameState('BATTLE_ANSWER_QUESTION');
   };
 
-  const handlePVEAnswer = async (index: number) => {
+  const handlePVEAnswer = async (index?: number, frqCorrect?: boolean) => {
     setGameState('BATTLE_RESOLVE');
+    setGeminiResult(null);
+    setShowManualCheck(false);
     const { campaignStore } = await import('./CampaignWorld');
     const buffs = campaignStore.getBuffs();
 
     const myStance = roomState.players['player1'].stance;
     const botStance = roomState.players[botOpponent.id].stance;
-    const isCorrect = index === question?.correctIndex;
+    
+    let isCorrect = false;
+    // FRQ / Manual check support for PVE
+    if (frqCorrect !== undefined) {
+      isCorrect = frqCorrect;
+    } else {
+      isCorrect = index === question?.correctIndex;
+    }
     
     // Simple damage logic
     let myDamage = isCorrect ? (myStance === 'ATTACK' ? 20 : myStance === 'MAGIC' ? 15 : myStance === 'DEFEND' ? 10 : 0) : 0;
@@ -329,6 +352,43 @@ export function Game() {
     if (!roomId || gameState !== 'BATTLE_ANSWER_QUESTION') return;
     socket.emit('submit_answer', { roomId, answerIndex: index });
     setGameState('BATTLE_RESOLVE');
+  };
+
+  const handleFRQAnswer = (isCorrect: boolean) => {
+    if (isPVE) {
+      handlePVEAnswer(undefined, isCorrect);
+      return;
+    }
+    if (!roomId || gameState !== 'BATTLE_ANSWER_QUESTION') return;
+    socket.emit('submit_answer', { roomId, isCorrect });
+    setGameState('BATTLE_RESOLVE');
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isPVE) {
+       // Mock for PVE (could also hit an API endpoint if we wanted, but to keep simple:)
+       alert("Gemini checking is currently for Multiplayer. Please use Manual Check in Campaign Mode!");
+       return;
+    }
+
+    setIsCheckingFRQ(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      socket.emit('check_frq_with_gemini', {
+        roomId,
+        imageBase64: base64,
+        mimeType: file.type
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleManualCheck = () => {
+    setShowManualCheck(true);
   };
 
   const restartGame = async () => {
@@ -1107,7 +1167,7 @@ export function Game() {
               exit={{ opacity: 0 }}
               className="w-full max-w-4xl mx-auto bg-white border-[6px] border-[#fcd34d] rounded-[3rem] p-8 md:p-10 shadow-[0_16px_0_#fcd34d] relative mt-10"
             >
-              <Timer endTime={questionEndTime} />
+              {/* Timer removed per user request */}
               
               {isPVE && (
                 <button 
@@ -1142,17 +1202,67 @@ export function Game() {
                 <MathText text={question.text} />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {question.options.map((opt, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => handleAnswer(idx)}
-                    className="p-6 text-xl md:text-2xl rounded-2xl border-4 border-[#e2e8f0] bg-white hover:bg-[#f8fafc] hover:border-[#38bdf8] active:translate-y-2 active:border-b-4 hover:shadow-[0_8px_0_#38bdf8] shadow-[0_8px_0_#e2e8f0] cursor-pointer transition-all flex items-center justify-center min-h-[100px] text-[#334155] font-bold"
-                  >
-                    <MathText text={opt} />
-                  </button>
-                ))}
-              </div>
+              {question.isFRQ ? (
+                <div className="flex flex-col items-center gap-6 w-full">
+                  {showManualCheck ? (
+                     <div className="bg-white border-4 border-[#3ecf8e] p-6 rounded-2xl w-full text-center shadow-[0_8px_0_#3ecf8e]">
+                       <h4 className="text-xl font-bold text-[#2bae74] mb-4 uppercase tracking-widest">Manual Answer Check</h4>
+                       <div className="text-xl md:text-2xl font-black mb-6 bg-green-50 p-6 rounded-xl border-2 border-green-200">
+                          <MathText text={question.answerKey || ""} />
+                       </div>
+                       <p className="font-bold text-slate-600 mb-6 text-lg">Did your work yield this exact answer?</p>
+                       <div className="flex gap-4 justify-center">
+                         <button onClick={() => handleFRQAnswer(true)} className="bg-[#10b981] hover:bg-[#059669] text-white px-10 py-4 rounded-xl font-black text-xl shadow-[0_6px_0_#047857] active:translate-y-1 active:shadow-none transition-all cursor-pointer">Yes, Correct</button>
+                         <button onClick={() => handleFRQAnswer(false)} className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-10 py-4 rounded-xl font-black text-xl shadow-[0_6px_0_#b91c1c] active:translate-y-1 active:shadow-none transition-all cursor-pointer">No, Incorrect</button>
+                       </div>
+                     </div>
+                  ) : geminiResult ? (
+                     <div className={`border-4 p-8 rounded-2xl w-full text-center shadow-[0_8px_0_rgba(0,0,0,0.1)] ${geminiResult.correct ? 'border-[#3ecf8e] bg-green-50' : 'border-[#ef4444] bg-red-50'}`}>
+                       <h4 className={`text-3xl font-black mb-4 ${geminiResult.correct ? 'text-[#2bae74]' : 'text-[#dc2626]'}`}>
+                         {geminiResult.correct ? 'Gemini: CORRECT! 🎉' : 'Gemini: INCORRECT! ❌'}
+                       </h4>
+                       <p className="text-lg font-bold text-slate-700 mb-8 italic">"{geminiResult.explanation}"</p>
+                       <button onClick={() => handleFRQAnswer(geminiResult.correct)} className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-12 py-4 rounded-xl font-black text-xl shadow-[0_6px_0_#1d4ed8] active:translate-y-1 active:shadow-none transition-all cursor-pointer">Continue Battle</button>
+                     </div>
+                  ) : (
+                     <div className="w-full flex flex-col md:flex-row gap-6 justify-center">
+                        <label className={`flex-1 relative border-4 border-dashed border-[#cbd5e1] hover:border-[#38bdf8] bg-[#f8fafc] hover:bg-[#f0f9ff] rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${isCheckingFRQ ? 'opacity-50 pointer-events-none' : ''}`}>
+                          <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileUpload} disabled={isCheckingFRQ} />
+                          {isCheckingFRQ ? (
+                            <div className="flex flex-col items-center">
+                              <div className="w-16 h-16 border-4 border-t-[#38bdf8] border-r-[#38bdf8] border-b-transparent border-l-transparent rounded-full animate-spin mb-4" />
+                              <span className="font-black text-lg text-slate-600 animate-pulse">Gemini is grading your spell...</span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center text-center">
+                              <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">📸</div>
+                              <span className="font-black text-2xl text-[#334155] mb-2">Take Picture of Work</span>
+                              <span className="text-sm font-bold text-slate-400">Gemini AI will grade it</span>
+                            </div>
+                          )}
+                        </label>
+                        <div className="flex items-center justify-center font-black text-slate-300 text-xl py-4 md:py-0">OR</div>
+                        <button onClick={handleManualCheck} disabled={isCheckingFRQ} className={`flex-1 border-4 border-[#e2e8f0] bg-white hover:bg-[#f1f5f9] rounded-2xl p-10 flex flex-col items-center justify-center shadow-[0_8px_0_#e2e8f0] active:translate-y-2 active:shadow-none transition-all cursor-pointer ${isCheckingFRQ ? 'opacity-50 pointer-events-none' : ''}`}>
+                          <div className="text-6xl mb-4">👁️</div>
+                          <span className="font-black text-2xl text-[#334155] mb-2">Manual Check</span>
+                          <span className="text-sm font-bold text-slate-400">Grade it yourself honestly</span>
+                        </button>
+                     </div>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {question.options?.map((opt, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => handleAnswer(idx)}
+                      className={`p-6 text-xl md:text-2xl rounded-2xl border-4 border-[#e2e8f0] bg-white hover:bg-[#f8fafc] hover:border-[#38bdf8] active:translate-y-2 active:border-b-4 hover:shadow-[0_8px_0_#38bdf8] shadow-[0_8px_0_#e2e8f0] cursor-pointer transition-all flex items-center justify-center min-h-[100px] text-[#334155] font-bold ${question.options && question.options.length % 2 !== 0 && idx === question.options.length - 1 ? 'md:col-span-2' : ''}`}
+                    >
+                      <MathText text={opt} />
+                    </button>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 

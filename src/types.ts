@@ -4,10 +4,12 @@ export interface Question {
   id: string;
   topic: Topic;
   text: string;
-  options: string[];
-  correctIndex: number;
+  options?: string[];
+  correctIndex?: number;
   explanation?: string;
   difficulty?: 'Normal' | 'Nightmare';
+  isFRQ?: boolean;
+  answerKey?: string;
 }
 
 export type EnemyType = 'Goblin' | 'Slime' | 'Dragon' | 'Wizard';

@@ -235,75 +235,45 @@ export const QUESTIONS: Question[] = [
     id: 'nightmare_1',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
+    isFRQ: true,
     text: 'Consider $r = 1 + 2\\cos(\\theta)$. At what values of $\\theta$ in $[0, 2\\pi)$ does the curve pass through the origin?',
-    options: [
-      '$\\pi/3$ and $5\\pi/3$',
-      '$2\\pi/3$ and $4\\pi/3$',
-      '$\\pi/2$ and $3\\pi/2$',
-      '$\\pi/6$ and $11\\pi/6$',
-      'None, it never passes through the origin'
-    ],
-    correctIndex: 1,
-    explanation: '$1 + 2\\cos\\theta = 0 \\Rightarrow \\cos\\theta = -1/2 \\Rightarrow \\theta = 2\\pi/3, 4\\pi/3$.'
+    answerKey: '$1 + 2\\cos\\theta = 0 \\Rightarrow \\cos\\theta = -1/2 \\Rightarrow \\theta = 2\\pi/3, 4\\pi/3$.',
+    explanation: 'The origin is reached when r = 0. Solving $1 + 2\\cos\\theta = 0$ yields $2\\pi/3$ and $4\\pi/3$.'
   },
   {
     id: 'nightmare_2',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
+    isFRQ: true,
     text: 'For the curve $r = 1 + 2\\cos(\\theta)$, what is the slope of the tangent line at $\\theta = \\pi/2$?',
-    options: [
-      '$1/2$',
-      '$-1/2$',
-      '$2$',
-      '$-2$',
-      '$0$'
-    ],
-    correctIndex: 0,
+    answerKey: '1/2',
     explanation: '$x = (1+2\\cos\\theta)\\cos\\theta$, $y = (1+2\\cos\\theta)\\sin\\theta$. $dy/dx$ at $\\pi/2$ is $1/2$.'
   },
   {
     id: 'nightmare_3',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
-    text: 'Regarding $r = 1 + 2\\cos(\\theta)$, which scholar correctly identifies the area of the outer loop?',
-    options: [
-      'Scholar 1: Total area is $3\\pi$.',
-      'Scholar 2: Outer loop is $\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}r^2 d\\theta$.',
-      'Scholar 3: Subtract inner loop from total.',
-      'All of them are wrong.',
-      'Scholar 2 & 3 are partially correct.'
-    ],
-    correctIndex: 1,
+    isFRQ: true,
+    text: 'For $r = 1 + 2\\cos(\\theta)$, find the area of the outer loop only. Set up the integral.',
+    answerKey: '$\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}(1+2\\cos\\theta)^2 d\\theta$',
     explanation: 'The outer loop is traced from $-2\\pi/3$ to $2\\pi/3$. Area is $\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}(1+2\\cos\\theta)^2 d\\theta$.'
   },
   {
     id: 'nightmare_parametric_1',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
+    isFRQ: true,
     text: 'A particle moves with $dx/dt = (6/t - 3)^{1/3}$ and $dy/dt = t e^{-t}$. At what time $t$ is the particle farthest to the right?',
-    options: [
-      '$t = 1$',
-      '$t = 2$',
-      '$t = 3$',
-      '$t = e$',
-      'Never'
-    ],
-    correctIndex: 1,
+    answerKey: 't = 2',
     explanation: 'Farthest right when $dx/dt = 0$ and switches from positive to negative. $6/t - 3 = 0 \\Rightarrow t = 2$.'
   },
   {
     id: 'nightmare_parametric_2',
     topic: 'Nightmare',
     difficulty: 'Nightmare',
-    text: 'If $P(3) = (5, 4)$ and $dx/dt = (6/t - 3)^{1/3}$, which integral finds the x-coordinate when the particle is farthest right ($t=2$)?',
-    options: [
-      '$5 + \\int_{2}^{3} (6/t - 3)^{1/3} dt$',
-      '$5 - \\int_{2}^{3} (6/t - 3)^{1/3} dt$',
-      '$\\int_{2}^{3} (6/t - 3)^{1/3} dt$',
-      '$5 + \\int_{3}^{2} (6/t - 3)^{1/3} dt$',
-      'None of these'
-    ],
-    correctIndex: 1,
+    isFRQ: true,
+    text: 'If $P(3) = (5, 4)$ and $dx/dt = (6/t - 3)^{1/3}$, find the x-coordinate when the particle is farthest right ($t=2$) using an integral.',
+    answerKey: '$5 - \\int_{2}^{3} (6/t - 3)^{1/3} dt$',
     explanation: '$x(2) = x(3) + \\int_3^2 x\'(t) dt = 5 - \\int_2^3 x\'(t) dt$.'
   }
 ];
