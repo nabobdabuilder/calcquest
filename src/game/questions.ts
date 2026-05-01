@@ -3,19 +3,116 @@ import type { Question } from '../types.ts';
 export const QUESTIONS: Question[] = [
   // --- SECTION 1: REGULAR QUESTIONS ---
   
-  // Parametric (Keep a few basics for the start)
+  // --- SECTION 1: PARAMETRIC QUESTIONS ---
   {
     id: 'param_1',
     topic: 'Parametric',
-    text: 'A particle moves with $x(t) = t^2$ and $y(t) = 3t - 1$. Find the coordinates at $t = 2$.',
+    text: 'If $x = t^2 + 1$ and $y = t^3$, find the expression for $d^2y/dx^2$ in terms of $t$.',
     options: [
-      '(4, 5)',
-      '(2, 5)',
-      '(4, 7)',
-      '(2, 7)'
+      '$3/4t$',
+      '$3/2t$',
+      '$3t$',
+      '$6t$',
+      '$3/2$'
     ],
     correctIndex: 0,
-    explanation: '$x(2) = 2^2 = 4$, $y(2) = 3(2) - 1 = 5$.'
+    explanation: '$dy/dx = (3t^2)/(2t) = 1.5t$. Then $d^2y/dx^2 = (d/dt(1.5t))/(dx/dt) = 1.5 / 2t = 3/4t$.'
+  },
+  {
+    id: 'param_2',
+    topic: 'Parametric',
+    text: 'Find the acceleration vector of a particle at $t = 1$ if $x = 4t + t^2$ and $y = 1 / (3t + 1)$.',
+    options: [
+      '$(2, 1/8)$',
+      '$(2, 9/32)$',
+      '$(5, 1/4)$',
+      '$(6, -3/16)$',
+      '$(6, -1/8)$'
+    ],
+    correctIndex: 1,
+    explanation: '$x\'\' = 2$, $y\'\' = 18/(3t+1)^3$. At $t=1$, $y\'\' = 18/64 = 9/32$.'
+  },
+  {
+    id: 'param_3',
+    topic: 'Parametric',
+    text: 'A particle has $x\'(t) = t \\sin(t)$ and $y\'(t) = 5e^{-3t} + 2$. What is the slope of the tangent line at $t = 2$?',
+    options: [
+      '0.904',
+      '1.107',
+      '1.819',
+      '2.012',
+      '3.660'
+    ],
+    correctIndex: 1,
+    explanation: 'Slope $= y\'(2)/x\'(2) = (5e^{-6} + 2) / (2\\sin(2)) \\approx 1.107$.'
+  },
+  {
+    id: 'param_4',
+    topic: 'Parametric',
+    text: 'Which integral gives the length of the path for $x(t) = 2 + 3t$ and $y(t) = 1 + t^2$ from $t = 0$ to $t = 1$?',
+    options: [
+      '$\\int_{0}^{1} \\sqrt{1 + \\frac{4t^2}{9}} dt$',
+      '$\\int_{0}^{1} \\sqrt{1 + 4t^2} dt$',
+      '$\\int_{0}^{1} \\sqrt{3 + 3t + t^2} dt$',
+      '$\\int_{0}^{1} \\sqrt{9 + 4t^2} dt$',
+      '$\\int_{0}^{1} \\sqrt{(2 + 3t)^2 + (1 + t^2)^2} dt$'
+    ],
+    correctIndex: 3,
+    explanation: '$L = \\int \\sqrt{(dx/dt)^2 + (dy/dt)^2} dt = \\int \\sqrt{3^2 + (2t)^2} dt$.'
+  },
+  {
+    id: 'param_5',
+    topic: 'Parametric',
+    text: 'A particle moves with velocity $v(t) = (f(t), g(t))$. At $t = 3$, it is at $(-4, 5)$. Which represents the position at $t = 1$?',
+    options: [
+      '$(-2f(3), -2g(3))$',
+      '$(-4 - 2f(3), 5 - 2g(3))$',
+      '$(\\int_{1}^{3} f(t) dt, \\int_{1}^{3} g(t) dt)$',
+      '$(-4 - \\int_{1}^{3} f(t) dt, 5 - \\int_{1}^{3} g(t) dt)$',
+      '$(-4 + \\int_{1}^{3} f(t) dt, 5 + \\int_{1}^{3} g(t) dt)$'
+    ],
+    correctIndex: 3,
+    explanation: '$P(1) = P(3) + \\int_3^1 v(t) dt = P(3) - \\int_1^3 v(t) dt$.'
+  },
+  {
+    id: 'param_6',
+    topic: 'Parametric',
+    text: 'What is the perimeter of the ellipse $x(t) = 1 + 2\\cos(t)$ and $y(t) = 3\\sin(t)$ for $0 \\leq t \\leq 2\\pi$?',
+    options: [
+      '6.283',
+      '15.865',
+      '16.574',
+      '40.841'
+    ],
+    correctIndex: 1,
+    explanation: 'Using the arc length integral: $\\int_0^{2\\pi} \\sqrt{(-2\\sin t)^2 + (3\\cos t)^2} dt \\approx 15.865$.'
+  },
+  {
+    id: 'param_7',
+    topic: 'Parametric',
+    text: 'The position of a particle is $x(t) = t^3 + 2t$ and $y(t) = 5t^2 - 7$. What is the speed of the particle at $t = 3$?',
+    options: [
+      '1.034',
+      '18.601',
+      '18.709',
+      '41.725'
+    ],
+    correctIndex: 3,
+    explanation: 'Speed $= \\sqrt{(3(3)^2+2)^2 + (10(3))^2} = \\sqrt{29^2 + 30^2} \\approx 41.725$.'
+  },
+  {
+    id: 'param_8',
+    topic: 'Parametric',
+    text: 'An object travels along $x = 3\\cos(t), y = 4\\sin(t)$. At $t = 13$, it leaves on a tangent line. What is the slope of that line?',
+    options: [
+      '$-4/3$',
+      '$-3/4$',
+      '$(4 \\tan(13)) / 3$',
+      '$-4 / (3 \\tan(13))$',
+      '$(3 \\tan(13)) / 4$'
+    ],
+    correctIndex: 3,
+    explanation: '$dy/dx = (4\\cos(13)) / (-3\\sin(13)) = -4/(3\\tan(13))$.'
   },
 
   // Polar Graphing
@@ -178,6 +275,36 @@ export const QUESTIONS: Question[] = [
     ],
     correctIndex: 1,
     explanation: 'The outer loop is traced from $-2\\pi/3$ to $2\\pi/3$. Area is $\\int_{-2\\pi/3}^{2\\pi/3} \\frac{1}{2}(1+2\\cos\\theta)^2 d\\theta$.'
+  },
+  {
+    id: 'nightmare_parametric_1',
+    topic: 'Nightmare',
+    difficulty: 'Nightmare',
+    text: 'A particle moves with $dx/dt = (6/t - 3)^{1/3}$ and $dy/dt = t e^{-t}$. At what time $t$ is the particle farthest to the right?',
+    options: [
+      '$t = 1$',
+      '$t = 2$',
+      '$t = 3$',
+      '$t = e$',
+      'Never'
+    ],
+    correctIndex: 1,
+    explanation: 'Farthest right when $dx/dt = 0$ and switches from positive to negative. $6/t - 3 = 0 \\Rightarrow t = 2$.'
+  },
+  {
+    id: 'nightmare_parametric_2',
+    topic: 'Nightmare',
+    difficulty: 'Nightmare',
+    text: 'If $P(3) = (5, 4)$ and $dx/dt = (6/t - 3)^{1/3}$, which integral finds the x-coordinate when the particle is farthest right ($t=2$)?',
+    options: [
+      '$5 + \\int_{2}^{3} (6/t - 3)^{1/3} dt$',
+      '$5 - \\int_{2}^{3} (6/t - 3)^{1/3} dt$',
+      '$\\int_{2}^{3} (6/t - 3)^{1/3} dt$',
+      '$5 + \\int_{3}^{2} (6/t - 3)^{1/3} dt$',
+      'None of these'
+    ],
+    correctIndex: 1,
+    explanation: '$x(2) = x(3) + \\int_3^2 x\'(t) dt = 5 - \\int_2^3 x\'(t) dt$.'
   }
 ];
 
