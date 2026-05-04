@@ -65,8 +65,8 @@ async function startServer() {
         const roomState = {
           id: roomId,
           players: {
-            [player1.id]: { id: player1.id, name: player1.name, avatar: player1.avatar, hp: 100, stance: null, correctAnswers: 0 },
-            [player2.id]: { id: player2.id, name: player2.name, avatar: player2.avatar, hp: 100, stance: null, correctAnswers: 0 }
+            [player1.id]: { id: player1.id, name: player1.name, avatar: player1.avatar, hp: 100, stance: null, correctAnswers: 0, lastQuestionId: null },
+            [player2.id]: { id: player2.id, name: player2.name, avatar: player2.avatar, hp: 100, stance: null, correctAnswers: 0, lastQuestionId: null }
           },
           state: 'SELECT_STANCE', // SELECT_STANCE -> ANSWER_QUESTION -> RESOLVE
           currentQuestion: null,
@@ -112,17 +112,21 @@ async function startServer() {
         
         room.playerQuestions = {};
         if (isSuper(p1.stance)) {
-          room.playerQuestions[p1.id] = getRandomQuestion('Nightmare');
+          room.playerQuestions[p1.id] = getRandomQuestion('Nightmare', room.players[p1.id].lastQuestionId);
         } else {
-          room.playerQuestions[p1.id] = getRandomQuestion('Normal');
+          room.playerQuestions[p1.id] = getRandomQuestion('Normal', room.players[p1.id].lastQuestionId);
         }
 
         if (isSuper(p2.stance)) {
-          room.playerQuestions[p2.id] = getRandomQuestion('Nightmare');
+          room.playerQuestions[p2.id] = getRandomQuestion('Nightmare', room.players[p2.id].lastQuestionId);
         } else {
-          // If neither is super, they should get the same question. If one is, the normal gets a normal
-          room.playerQuestions[p2.id] = (!isSuper(p1.stance) && !isSuper(p2.stance)) ? room.playerQuestions[p1.id] : getRandomQuestion('Normal');
+          room.playerQuestions[p2.id] = (!isSuper(p1.stance) && !isSuper(p2.stance)) 
+            ? room.playerQuestions[p1.id] 
+            : getRandomQuestion('Normal', room.players[p2.id].lastQuestionId);
         }
+
+        room.players[p1.id].lastQuestionId = room.playerQuestions[p1.id].id;
+        room.players[p2.id].lastQuestionId = room.playerQuestions[p2.id].id;
 
         room.answers = {};
         

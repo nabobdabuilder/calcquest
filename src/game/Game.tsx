@@ -46,6 +46,7 @@ export function Game() {
   const [botOpponent, setBotOpponent] = useState<any>(null);
   const [activeEmotes, setActiveEmotes] = useState<{[key: string]: { emote: string, id: number }}>({}); // playerId -> emote details
   const [deathDialogIndex, setDeathDialogIndex] = useState<number>(0);
+  const [lastQuestionId, setLastQuestionId] = useState<string | null>(null);
 
   // FRQ State
   const [isCheckingFRQ, setIsCheckingFRQ] = useState(false);
@@ -192,13 +193,21 @@ export function Game() {
     
     if (isSuper) {
       const { getRandomQuestion } = await import('./questions');
-      q = getRandomQuestion('Nightmare');
+      q = getRandomQuestion('Nightmare', lastQuestionId || undefined);
     } else {
       const topic = botOpponent?.topic || 'Parametric';
-      const topicQuestions = QUESTIONS.filter(q => q.topic === topic && (q.difficulty || 'Normal') === 'Normal');
-      q = topicQuestions.length > 0 
-        ? topicQuestions[Math.floor(Math.random() * topicQuestions.length)]
-        : QUESTIONS.filter(q => (q.difficulty || 'Normal') === 'Normal')[Math.floor(Math.random() * QUESTIONS.length)];
+      let topicQuestions = QUESTIONS.filter(q => q.topic === topic && (q.difficulty || 'Normal') === 'Normal');
+      
+      if (topicQuestions.length === 0) {
+        topicQuestions = QUESTIONS.filter(q => (q.difficulty || 'Normal') === 'Normal');
+      }
+
+      if (topicQuestions.length > 1 && lastQuestionId) {
+        const withoutLast = topicQuestions.filter(q => q.id !== lastQuestionId);
+        q = withoutLast[Math.floor(Math.random() * withoutLast.length)];
+      } else {
+        q = topicQuestions[Math.floor(Math.random() * topicQuestions.length)];
+      }
     }
 
     setRoomState((prev: any) => {
@@ -209,6 +218,7 @@ export function Game() {
     });
 
     setQuestion(q);
+    if (q) setLastQuestionId(q.id);
     setQuestionEndTime(Date.now() + 10000);
     setGameState('BATTLE_ANSWER_QUESTION');
   };
@@ -1198,7 +1208,7 @@ export function Game() {
                 CAST YOUR SPELL! ✨
               </div>
 
-              <div className="text-xl md:text-3xl leading-snug font-bold my-8 text-center text-[#451a03] min-h-[120px] flex items-center justify-center bg-[#fef3c7] p-8 rounded-3xl border-4 border-[#fde68a]">
+              <div className={`text-xl md:text-2xl leading-relaxed font-bold my-8 ${question.isFRQ ? 'text-left items-start' : 'text-center items-center'} text-[#451a03] min-h-[160px] flex justify-center bg-[#fef3c7] p-8 rounded-3xl border-4 border-[#fde68a] overflow-y-auto max-h-[60vh]`}>
                 <MathText text={question.text} />
               </div>
 

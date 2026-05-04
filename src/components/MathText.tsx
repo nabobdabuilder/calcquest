@@ -11,7 +11,7 @@ export function MathText({ text }: MathTextProps) {
   const parts = text.split('$');
 
   return (
-    <span className="text-inherit">
+    <span className="text-inherit whitespace-pre-wrap">
       {parts.map((part, index) => {
         if (index % 2 === 1) {
           // Odd indexes are inside the $...$
